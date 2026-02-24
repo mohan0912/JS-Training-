@@ -1,0 +1,2110 @@
+================================================================================
+       JAVASCRIPT FUNDAMENTALS FOR PLAYWRIGHT AUTOMATION ENGINEERS
+              Complete Guide for Novice Automation Engineers
+================================================================================
+
+This comprehensive guide covers all JavaScript concepts needed to work with
+Playwright. Each section includes a brief description and practical examples.
+
+================================================================================
+TABLE OF CONTENTS
+================================================================================
+  1.  Variables and Data Types
+  2.  Operators
+  3.  Type Coercion and Truthy/Falsy Values
+  4.  String Methods
+  5.  Array Methods
+  6.  Control Flow (Conditionals)
+  7.  Loops and Iteration
+  8.  Functions
+  9.  Scope, Hoisting, and Closures
+  10. Asynchronous JavaScript (CRITICAL for Playwright)
+  11. Object-Oriented Programming (OOP) Concepts
+  12. ES6+ Modern JavaScript Features
+  13. Modules (Import/Export)
+  14. Error Handling
+  15. JSON Handling
+  16. Built-in Objects (Console, Math, Date)
+  17. Regular Expressions
+  18. Collections: Set and Map
+  19. Playwright-Specific JavaScript Patterns
+  20. Practice Exercises
+  21. Next Steps for Playwright
+
+================================================================================
+1. VARIABLES AND DATA TYPES
+================================================================================
+
+Variables store data values that you use throughout your tests.
+
+--------------------------------------------------------------------------------
+1.1 Variable Declarations: var, let, const
+--------------------------------------------------------------------------------
+Use `const` for values that won't change, `let` for values that will change.
+Avoid `var` as it has function scope and can cause unexpected bugs.
+
+    const browserName = 'chromium';   // Cannot be reassigned
+    let pageTitle = 'Home';           // Can be reassigned later
+    var oldStyle = 'avoid';           // Function-scoped, outdated - DON'T USE
+
+    pageTitle = 'Dashboard';          // OK - let allows reassignment
+    // browserName = 'firefox';       // ERROR - const cannot be reassigned
+
+--------------------------------------------------------------------------------
+1.2 String
+--------------------------------------------------------------------------------
+Text data enclosed in quotes. Used for URLs, selectors, and assertions.
+
+    // Single quotes
+    const url = 'https://example.com';
+
+    // Double quotes
+    const selector = "button[type='submit']";
+
+    // Template literals (backticks) - allows embedded expressions
+    const username = 'John';
+    const greeting = `Hello, ${username}!`;  // "Hello, John!"
+
+--------------------------------------------------------------------------------
+1.3 Number
+--------------------------------------------------------------------------------
+Numeric values for timeouts, retry counts, and calculations.
+
+    const timeout = 5000;        // 5 seconds in milliseconds
+    const maxRetries = 3;        // Integer
+    const price = 29.99;         // Decimal (floating point)
+    const negative = -10;        // Negative number
+    const infinity = Infinity;   // Special numeric value
+
+--------------------------------------------------------------------------------
+1.4 Boolean
+--------------------------------------------------------------------------------
+True or false values used in conditions and flags.
+
+    const isVisible = true;
+    const isDisabled = false;
+    const isLoggedIn = true;
+
+    // Result of comparisons are booleans
+    const isAdult = age >= 18;   // true or false
+
+--------------------------------------------------------------------------------
+1.5 Array
+--------------------------------------------------------------------------------
+Ordered collection of items. Used for lists of elements, test data, etc.
+
+    const browsers = ['chromium', 'firefox', 'webkit'];
+    const testData = [1, 2, 3, 4, 5];
+    const mixed = ['text', 42, true, null];  // Can mix types
+
+    // Accessing elements (0-indexed)
+    console.log(browsers[0]);    // 'chromium' (first element)
+    console.log(browsers[2]);    // 'webkit' (third element)
+    console.log(browsers.length); // 3
+
+--------------------------------------------------------------------------------
+1.6 Object
+--------------------------------------------------------------------------------
+Key-value pairs to store structured data like user info, page configs.
+
+    const user = {
+        name: 'John',
+        email: 'john@test.com',
+        age: 30,
+        isActive: true
+    };
+
+    // Accessing properties
+    console.log(user.name);       // 'John' (dot notation)
+    console.log(user['email']);   // 'john@test.com' (bracket notation)
+
+    // Modifying properties
+    user.age = 31;
+    user['isActive'] = false;
+
+--------------------------------------------------------------------------------
+1.7 null and undefined
+--------------------------------------------------------------------------------
+`null` is intentional absence of value; `undefined` means not yet assigned.
+
+    let element = null;          // Explicitly set to "no value"
+    let notAssigned;             // undefined - declared but not assigned
+    
+    console.log(element);        // null
+    console.log(notAssigned);    // undefined
+
+--------------------------------------------------------------------------------
+1.8 Symbol and BigInt (Advanced)
+--------------------------------------------------------------------------------
+Symbol creates unique identifiers; BigInt handles very large integers.
+
+    const uniqueId = Symbol('id');           // Unique identifier
+    const bigNumber = 9007199254740991n;     // BigInt for large numbers
+
+
+================================================================================
+2. OPERATORS
+================================================================================
+
+Operators perform operations on values and variables.
+
+--------------------------------------------------------------------------------
+2.1 Arithmetic Operators
+--------------------------------------------------------------------------------
+Mathematical operations for calculations.
+
+    const a = 10, b = 3;
+
+    console.log(a + b);    // 13 (addition)
+    console.log(a - b);    // 7  (subtraction)
+    console.log(a * b);    // 30 (multiplication)
+    console.log(a / b);    // 3.333... (division)
+    console.log(a % b);    // 1  (modulo - remainder)
+    console.log(a ** b);   // 1000 (exponentiation - 10^3)
+
+--------------------------------------------------------------------------------
+2.2 Comparison Operators
+--------------------------------------------------------------------------------
+Compare values; result is always a boolean.
+
+    console.log(5 === 5);     // true  (strict equality - checks type too)
+    console.log(5 == '5');    // true  (loose equality - converts types)
+    console.log(5 !== 3);     // true  (strict not equal)
+    console.log(5 > 3);       // true  (greater than)
+    console.log(5 < 3);       // false (less than)
+    console.log(5 >= 5);      // true  (greater than or equal)
+    console.log(5 <= 3);      // false (less than or equal)
+
+    // IMPORTANT: Always use === and !== (strict) in your tests!
+
+--------------------------------------------------------------------------------
+2.3 Logical Operators
+--------------------------------------------------------------------------------
+Combine multiple conditions.
+
+    const isLoggedIn = true;
+    const hasPermission = false;
+
+    console.log(isLoggedIn && hasPermission);  // false (AND - both must be true)
+    console.log(isLoggedIn || hasPermission);  // true  (OR - at least one true)
+    console.log(!isLoggedIn);                  // false (NOT - inverts value)
+
+--------------------------------------------------------------------------------
+2.4 Assignment Operators
+--------------------------------------------------------------------------------
+Assign and modify variable values.
+
+    let counter = 0;
+
+    counter = 5;      // Basic assignment
+    counter += 3;     // counter = counter + 3  → 8
+    counter -= 2;     // counter = counter - 2  → 6
+    counter *= 2;     // counter = counter * 2  → 12
+    counter /= 3;     // counter = counter / 3  → 4
+    counter++;        // Increment by 1         → 5
+    counter--;        // Decrement by 1         → 4
+
+
+================================================================================
+3. TYPE COERCION AND TRUTHY/FALSY VALUES
+================================================================================
+
+JavaScript automatically converts types in certain situations.
+
+--------------------------------------------------------------------------------
+3.1 Type Coercion
+--------------------------------------------------------------------------------
+Automatic type conversion can lead to unexpected results.
+
+    // String concatenation with +
+    console.log('5' + 3);        // '53' (number becomes string)
+    console.log('5' - 3);        // 2    (string becomes number)
+
+    // Comparison coercion
+    console.log('10' == 10);     // true  (loose equality converts)
+    console.log('10' === 10);    // false (strict equality - different types)
+
+--------------------------------------------------------------------------------
+3.2 Truthy and Falsy Values
+--------------------------------------------------------------------------------
+Values that evaluate to true or false in boolean context.
+
+    // FALSY values (evaluate to false):
+    //   false, 0, -0, '', null, undefined, NaN
+
+    // TRUTHY values (evaluate to true):
+    //   Everything else: 'text', 1, [], {}, true
+
+    if ('hello') {
+        console.log('Truthy!');  // This runs
+    }
+
+    if (0) {
+        console.log('Falsy!');   // This does NOT run
+    }
+
+--------------------------------------------------------------------------------
+3.3 Explicit Type Conversion
+--------------------------------------------------------------------------------
+Convert types manually for clarity.
+
+    // To String
+    const str = String(123);         // '123'
+    const str2 = (123).toString();   // '123'
+
+    // To Number
+    const num = Number('42');        // 42
+    const num2 = parseInt('42px');   // 42
+    const num3 = parseFloat('3.14'); // 3.14
+
+    // To Boolean
+    const bool = Boolean('hello');   // true
+    const bool2 = !!'hello';         // true (double NOT trick)
+
+
+================================================================================
+4. STRING METHODS
+================================================================================
+
+Essential methods for handling text in web automation.
+
+    const text = '  Hello World  ';
+    const email = 'User@Example.COM';
+
+    // Case conversion
+    console.log(email.toLowerCase());     // 'user@example.com'
+    console.log(email.toUpperCase());     // 'USER@EXAMPLE.COM'
+
+    // Searching
+    console.log(text.includes('World'));  // true
+    console.log(text.indexOf('World'));   // 8 (position) or -1 if not found
+    console.log(text.startsWith('  H'));  // true
+    console.log(text.endsWith('  '));     // true
+
+    // Extracting
+    console.log(text.slice(2, 7));        // 'Hello'
+    console.log(text.substring(2, 7));    // 'Hello'
+    console.log(email.charAt(0));         // 'U'
+
+    // Modifying (returns new string - strings are immutable)
+    console.log(text.trim());             // 'Hello World' (remove whitespace)
+    console.log(text.replace('World', 'Playwright')); // '  Hello Playwright  '
+    console.log(text.replaceAll(' ', '-')); // '--Hello-World--'
+
+    // Splitting
+    console.log('a,b,c'.split(','));      // ['a', 'b', 'c']
+    console.log('Hello'.split(''));       // ['H', 'e', 'l', 'l', 'o']
+
+    // Length property
+    console.log(text.length);             // 15
+
+    // Padding
+    console.log('5'.padStart(3, '0'));    // '005'
+    console.log('5'.padEnd(3, '0'));      // '500'
+
+    // Repeating
+    console.log('ab'.repeat(3));          // 'ababab'
+
+
+================================================================================
+5. ARRAY METHODS
+================================================================================
+
+Manipulate collections of elements and test data.
+
+--------------------------------------------------------------------------------
+5.1 Adding and Removing Elements
+--------------------------------------------------------------------------------
+
+    const items = ['apple', 'banana'];
+
+    items.push('orange');      // Add to end    → ['apple', 'banana', 'orange']
+    items.pop();               // Remove from end → ['apple', 'banana']
+    items.unshift('mango');    // Add to start  → ['mango', 'apple', 'banana']
+    items.shift();             // Remove from start → ['apple', 'banana']
+
+    // Splice - add/remove at specific position
+    items.splice(1, 0, 'grape'); // At index 1, remove 0, add 'grape'
+                                 // → ['apple', 'grape', 'banana']
+
+--------------------------------------------------------------------------------
+5.2 Searching and Checking
+--------------------------------------------------------------------------------
+
+    const numbers = [1, 2, 3, 4, 5];
+
+    console.log(numbers.includes(3));      // true
+    console.log(numbers.indexOf(3));       // 2 (index position)
+    console.log(numbers.indexOf(99));      // -1 (not found)
+
+    // Find first matching element
+    const found = numbers.find(n => n > 3);       // 4
+    const foundIndex = numbers.findIndex(n => n > 3); // 3
+
+    // Check conditions
+    console.log(numbers.some(n => n > 4));   // true (at least one matches)
+    console.log(numbers.every(n => n > 0));  // true (all match)
+
+--------------------------------------------------------------------------------
+5.3 Transforming Arrays (VERY IMPORTANT)
+--------------------------------------------------------------------------------
+These methods return NEW arrays without modifying the original.
+
+    const numbers = [1, 2, 3, 4, 5];
+
+    // forEach - execute function for each element (no return value)
+    numbers.forEach(n => console.log(n));
+
+    // map - transform each element
+    const doubled = numbers.map(n => n * 2);
+    // → [2, 4, 6, 8, 10]
+
+    // filter - keep elements that match condition
+    const evens = numbers.filter(n => n % 2 === 0);
+    // → [2, 4]
+
+    // reduce - combine all elements into single value
+    const sum = numbers.reduce((accumulator, current) => {
+        return accumulator + current;
+    }, 0);  // 0 is initial value
+    // → 15
+
+    // Chaining methods
+    const result = numbers
+        .filter(n => n > 2)
+        .map(n => n * 10);
+    // → [30, 40, 50]
+
+--------------------------------------------------------------------------------
+5.4 Other Useful Array Methods
+--------------------------------------------------------------------------------
+
+    const arr = [3, 1, 4, 1, 5];
+
+    // Sorting (modifies original!)
+    const sorted = [...arr].sort((a, b) => a - b);  // [1, 1, 3, 4, 5]
+
+    // Reversing (modifies original!)
+    const reversed = [...arr].reverse();  // [5, 1, 4, 1, 3]
+
+    // Joining into string
+    console.log(arr.join('-'));  // '3-1-4-1-5'
+
+    // Concatenating arrays
+    const combined = [1, 2].concat([3, 4]);  // [1, 2, 3, 4]
+
+    // Slicing (extract portion)
+    console.log(arr.slice(1, 3));  // [1, 4] (index 1 to 2)
+
+    // Flat (flatten nested arrays)
+    const nested = [[1, 2], [3, 4]];
+    console.log(nested.flat());  // [1, 2, 3, 4]
+
+
+================================================================================
+6. CONTROL FLOW (CONDITIONALS)
+================================================================================
+
+Execute code based on conditions.
+
+--------------------------------------------------------------------------------
+6.1 if / else if / else
+--------------------------------------------------------------------------------
+
+    const status = 200;
+
+    if (status === 200) {
+        console.log('Success');
+    } else if (status === 404) {
+        console.log('Not Found');
+    } else if (status === 500) {
+        console.log('Server Error');
+    } else {
+        console.log('Unknown status');
+    }
+
+--------------------------------------------------------------------------------
+6.2 Ternary Operator
+--------------------------------------------------------------------------------
+Shorthand for simple if/else. Returns a value.
+
+    const age = 18;
+    const access = age >= 18 ? 'Allowed' : 'Denied';
+    // If age >= 18, access = 'Allowed', otherwise 'Denied'
+
+    // Can be nested (but avoid for readability)
+    const category = age < 13 ? 'child' : age < 20 ? 'teen' : 'adult';
+
+--------------------------------------------------------------------------------
+6.3 switch Statement
+--------------------------------------------------------------------------------
+Clean way to handle multiple conditions on same value.
+
+    const browser = 'firefox';
+
+    switch (browser) {
+        case 'chromium':
+            console.log('Launch Chrome');
+            break;
+        case 'firefox':
+            console.log('Launch Firefox');
+            break;
+        case 'webkit':
+            console.log('Launch Safari');
+            break;
+        default:
+            console.log('Unknown browser');
+    }
+
+
+================================================================================
+7. LOOPS AND ITERATION
+================================================================================
+
+Repeat actions multiple times.
+
+--------------------------------------------------------------------------------
+7.1 for Loop
+--------------------------------------------------------------------------------
+When you know how many iterations you need.
+
+    for (let i = 0; i < 5; i++) {
+        console.log(`Iteration ${i}`);  // 0, 1, 2, 3, 4
+    }
+
+    // Loop through array by index
+    const items = ['a', 'b', 'c'];
+    for (let i = 0; i < items.length; i++) {
+        console.log(items[i]);
+    }
+
+--------------------------------------------------------------------------------
+7.2 while Loop
+--------------------------------------------------------------------------------
+When you don't know how many iterations needed.
+
+    let count = 0;
+    while (count < 3) {
+        console.log(count);  // 0, 1, 2
+        count++;
+    }
+
+--------------------------------------------------------------------------------
+7.3 do...while Loop
+--------------------------------------------------------------------------------
+Runs at least once, then checks condition.
+
+    let num = 0;
+    do {
+        console.log(num);  // Runs at least once
+        num++;
+    } while (num < 3);
+
+--------------------------------------------------------------------------------
+7.4 for...of Loop (RECOMMENDED for Arrays)
+--------------------------------------------------------------------------------
+Iterate over array values directly.
+
+    const browsers = ['chromium', 'firefox', 'webkit'];
+
+    for (const browser of browsers) {
+        console.log(browser);  // 'chromium', 'firefox', 'webkit'
+    }
+
+--------------------------------------------------------------------------------
+7.5 for...in Loop (for Objects)
+--------------------------------------------------------------------------------
+Iterate over object keys.
+
+    const user = { name: 'John', age: 30, city: 'NYC' };
+
+    for (const key in user) {
+        console.log(`${key}: ${user[key]}`);
+    }
+    // name: John
+    // age: 30
+    // city: NYC
+
+--------------------------------------------------------------------------------
+7.6 break and continue
+--------------------------------------------------------------------------------
+
+    for (let i = 0; i < 10; i++) {
+        if (i === 3) continue;  // Skip this iteration
+        if (i === 7) break;     // Exit loop entirely
+        console.log(i);         // 0, 1, 2, 4, 5, 6
+    }
+
+
+================================================================================
+8. FUNCTIONS
+================================================================================
+
+Reusable blocks of code for test steps and utilities.
+
+--------------------------------------------------------------------------------
+8.1 Function Declaration
+--------------------------------------------------------------------------------
+Traditional way to define functions. Hoisted (can be called before definition).
+
+    function login(username, password) {
+        console.log(`Logging in as ${username}`);
+        return true;
+    }
+
+    const result = login('testuser', 'pass123');
+
+--------------------------------------------------------------------------------
+8.2 Function Expression
+--------------------------------------------------------------------------------
+Assign function to a variable. NOT hoisted.
+
+    const logout = function() {
+        console.log('Logging out');
+    };
+
+    logout();
+
+--------------------------------------------------------------------------------
+8.3 Arrow Functions (MODERN - PREFERRED)
+--------------------------------------------------------------------------------
+Concise syntax, commonly used in Playwright.
+
+    // Basic arrow function
+    const add = (a, b) => {
+        return a + b;
+    };
+
+    // Concise: single expression (implicit return)
+    const multiply = (a, b) => a * b;
+
+    // Single parameter: no parentheses needed
+    const double = n => n * 2;
+
+    // No parameters: empty parentheses required
+    const greet = () => 'Hello!';
+
+--------------------------------------------------------------------------------
+8.4 Default Parameters
+--------------------------------------------------------------------------------
+Provide fallback values when arguments not passed.
+
+    function navigate(url, timeout = 30000) {
+        console.log(`Going to ${url} with ${timeout}ms timeout`);
+    }
+
+    navigate('https://example.com');         // Uses default 30000
+    navigate('https://example.com', 5000);   // Uses 5000
+
+--------------------------------------------------------------------------------
+8.5 Rest Parameters
+--------------------------------------------------------------------------------
+Collect multiple arguments into an array.
+
+    function sum(...numbers) {
+        return numbers.reduce((acc, n) => acc + n, 0);
+    }
+
+    console.log(sum(1, 2, 3, 4));  // 10
+    console.log(sum(5, 10));       // 15
+
+--------------------------------------------------------------------------------
+8.6 Callback Functions
+--------------------------------------------------------------------------------
+Functions passed as arguments to other functions.
+
+    function processData(data, callback) {
+        const result = data * 2;
+        callback(result);
+    }
+
+    processData(5, (result) => {
+        console.log(`Result: ${result}`);  // Result: 10
+    });
+
+--------------------------------------------------------------------------------
+8.7 Higher-Order Functions
+--------------------------------------------------------------------------------
+Functions that take or return other functions.
+
+    // Function returning a function
+    function createMultiplier(factor) {
+        return (number) => number * factor;
+    }
+
+    const double = createMultiplier(2);
+    const triple = createMultiplier(3);
+
+    console.log(double(5));  // 10
+    console.log(triple(5));  // 15
+
+
+================================================================================
+9. SCOPE, HOISTING, AND CLOSURES
+================================================================================
+
+Understanding where variables are accessible.
+
+--------------------------------------------------------------------------------
+9.1 Block Scope (let and const)
+--------------------------------------------------------------------------------
+Variables declared with let/const are only accessible within their block.
+
+    {
+        let blockVar = 'inside';
+        const blockConst = 'also inside';
+        console.log(blockVar);  // Works
+    }
+    // console.log(blockVar);  // ERROR - not accessible outside block
+
+--------------------------------------------------------------------------------
+9.2 Function Scope
+--------------------------------------------------------------------------------
+Variables declared inside a function are not accessible outside.
+
+    function test() {
+        let localVar = 'local';
+        console.log(localVar);  // Works
+    }
+    // console.log(localVar);  // ERROR - not accessible outside function
+
+--------------------------------------------------------------------------------
+9.3 Global Scope
+--------------------------------------------------------------------------------
+Variables declared outside any function/block are globally accessible.
+
+    const globalVar = 'everywhere';
+
+    function anyFunction() {
+        console.log(globalVar);  // Accessible
+    }
+
+--------------------------------------------------------------------------------
+9.4 Hoisting
+--------------------------------------------------------------------------------
+Variable and function declarations are moved to top of their scope.
+
+    // Function declarations are fully hoisted
+    sayHello();  // Works!
+
+    function sayHello() {
+        console.log('Hello');
+    }
+
+    // var is hoisted but not initialized (undefined)
+    console.log(x);  // undefined (not error)
+    var x = 5;
+
+    // let/const are hoisted but not accessible before declaration
+    // console.log(y);  // ERROR: Cannot access before initialization
+    let y = 10;
+
+--------------------------------------------------------------------------------
+9.5 Closures (IMPORTANT)
+--------------------------------------------------------------------------------
+A function that remembers variables from its outer scope.
+
+    function createCounter() {
+        let count = 0;  // This variable is "closed over"
+        
+        return function() {
+            count++;
+            return count;
+        };
+    }
+
+    const counter = createCounter();
+    console.log(counter());  // 1
+    console.log(counter());  // 2
+    console.log(counter());  // 3
+    // count variable is preserved between calls!
+
+--------------------------------------------------------------------------------
+9.6 IIFE (Immediately Invoked Function Expression)
+--------------------------------------------------------------------------------
+Function that runs immediately after it's defined.
+
+    (function() {
+        const privateVar = 'hidden';
+        console.log('IIFE executed!');
+    })();
+
+    // Arrow function IIFE
+    (() => {
+        console.log('Arrow IIFE');
+    })();
+
+
+================================================================================
+10. ASYNCHRONOUS JAVASCRIPT (CRITICAL FOR PLAYWRIGHT)
+================================================================================
+
+Almost ALL Playwright operations are asynchronous. Master this section!
+
+--------------------------------------------------------------------------------
+10.1 Understanding Asynchronous Code
+--------------------------------------------------------------------------------
+JavaScript is single-threaded but handles async operations via event loop.
+Async operations (network requests, file I/O, timers) don't block execution.
+
+    console.log('1 - Start');
+    
+    setTimeout(() => {
+        console.log('2 - Timeout');
+    }, 0);
+    
+    console.log('3 - End');
+    
+    // Output: 1 - Start, 3 - End, 2 - Timeout
+    // (Timeout runs after synchronous code completes)
+
+--------------------------------------------------------------------------------
+10.2 Callbacks (Old Way)
+--------------------------------------------------------------------------------
+Functions called when async operation completes. Can lead to "callback hell".
+
+    function fetchData(callback) {
+        setTimeout(() => {
+            callback('Data received');
+        }, 1000);
+    }
+
+    fetchData((result) => {
+        console.log(result);  // After 1 second: 'Data received'
+    });
+
+--------------------------------------------------------------------------------
+10.3 Promises
+--------------------------------------------------------------------------------
+Object representing eventual completion or failure of async operation.
+
+    const promise = new Promise((resolve, reject) => {
+        setTimeout(() => {
+            const success = true;
+            if (success) {
+                resolve('Operation successful');
+            } else {
+                reject('Operation failed');
+            }
+        }, 1000);
+    });
+
+    // Using .then() and .catch()
+    promise
+        .then(result => console.log(result))
+        .catch(error => console.error(error))
+        .finally(() => console.log('Cleanup'));
+
+--------------------------------------------------------------------------------
+10.4 async/await (PREFERRED - USE THIS!)
+--------------------------------------------------------------------------------
+Modern way to write async code that looks synchronous.
+
+    // Mark function as async
+    async function testLogin(page) {
+        // Use await to wait for each async operation
+        await page.goto('https://example.com');
+        await page.fill('#username', 'testuser');
+        await page.fill('#password', 'password123');
+        await page.click('button[type="submit"]');
+        
+        // Await can be used in variable assignments
+        const title = await page.title();
+        console.log(title);
+    }
+
+    // Arrow function with async
+    const testLogout = async (page) => {
+        await page.click('#logout');
+        await page.waitForURL('**/login');
+    };
+
+--------------------------------------------------------------------------------
+10.5 Error Handling with try/catch/finally
+--------------------------------------------------------------------------------
+Handle errors gracefully in async code.
+
+    async function safeClick(page, selector) {
+        try {
+            await page.click(selector);
+            console.log('Click successful');
+            return true;
+        } catch (error) {
+            console.error('Click failed:', error.message);
+            return false;
+        } finally {
+            console.log('Click attempt completed');
+            // Runs whether success or failure
+        }
+    }
+
+--------------------------------------------------------------------------------
+10.6 Promise.all() - Parallel Execution
+--------------------------------------------------------------------------------
+Run multiple async operations simultaneously for faster tests.
+
+    // Wait for multiple elements at once
+    await Promise.all([
+        page.waitForSelector('#header'),
+        page.waitForSelector('#sidebar'),
+        page.waitForSelector('#footer')
+    ]);
+
+    // Get multiple values at once
+    const [title, url, content] = await Promise.all([
+        page.title(),
+        page.url(),
+        page.textContent('#main')
+    ]);
+
+--------------------------------------------------------------------------------
+10.7 Promise.race() - First to Complete
+--------------------------------------------------------------------------------
+Returns result of first promise to complete.
+
+    const result = await Promise.race([
+        page.waitForSelector('#success'),
+        page.waitForSelector('#error')
+    ]);
+    // result is whichever element appears first
+
+--------------------------------------------------------------------------------
+10.8 Promise.allSettled()
+--------------------------------------------------------------------------------
+Wait for all promises, regardless of success/failure.
+
+    const results = await Promise.allSettled([
+        page.click('#optional-button'),
+        page.click('#another-optional')
+    ]);
+
+    results.forEach((result, index) => {
+        if (result.status === 'fulfilled') {
+            console.log(`Promise ${index}: Success`);
+        } else {
+            console.log(`Promise ${index}: Failed - ${result.reason}`);
+        }
+    });
+
+
+================================================================================
+11. OBJECT-ORIENTED PROGRAMMING (OOP) CONCEPTS
+================================================================================
+
+OOP is essential for writing maintainable Page Object Models (POM).
+
+--------------------------------------------------------------------------------
+11.1 Object Literals
+--------------------------------------------------------------------------------
+Simplest way to create objects.
+
+    const testConfig = {
+        baseURL: 'https://example.com',
+        timeout: 30000,
+        headless: false,
+        
+        // Method inside object
+        getFullURL(path) {
+            return this.baseURL + path;
+        }
+    };
+
+    console.log(testConfig.getFullURL('/login'));
+
+--------------------------------------------------------------------------------
+11.2 Classes (IMPORTANT for Page Object Model)
+--------------------------------------------------------------------------------
+Blueprint for creating objects with properties and methods.
+
+    class LoginPage {
+        // Constructor runs when new instance created
+        constructor(page) {
+            this.page = page;
+            // Define selectors as properties
+            this.usernameInput = '#username';
+            this.passwordInput = '#password';
+            this.submitButton = 'button[type="submit"]';
+            this.errorMessage = '.error-msg';
+        }
+
+        // Methods define actions
+        async navigate() {
+            await this.page.goto('/login');
+        }
+
+        async login(username, password) {
+            await this.page.fill(this.usernameInput, username);
+            await this.page.fill(this.passwordInput, password);
+            await this.page.click(this.submitButton);
+        }
+
+        async getErrorMessage() {
+            return await this.page.textContent(this.errorMessage);
+        }
+    }
+
+    // Using the class
+    const loginPage = new LoginPage(page);
+    await loginPage.navigate();
+    await loginPage.login('testuser', 'password');
+
+--------------------------------------------------------------------------------
+11.3 Inheritance (extends)
+--------------------------------------------------------------------------------
+Create child classes that inherit from parent classes.
+
+    // Base page with common functionality
+    class BasePage {
+        constructor(page) {
+            this.page = page;
+            this.header = '#header';
+            this.footer = '#footer';
+        }
+
+        async waitForPageLoad() {
+            await this.page.waitForLoadState('networkidle');
+        }
+
+        async getTitle() {
+            return await this.page.title();
+        }
+    }
+
+    // Child class inherits from BasePage
+    class HomePage extends BasePage {
+        constructor(page) {
+            super(page);  // MUST call parent constructor
+            this.welcomeMessage = '.welcome';
+            this.navMenu = '#nav';
+        }
+
+        async getWelcomeText() {
+            return await this.page.textContent(this.welcomeMessage);
+        }
+    }
+
+    // HomePage has methods from both BasePage and itself
+    const homePage = new HomePage(page);
+    await homePage.waitForPageLoad();      // Inherited method
+    const welcome = await homePage.getWelcomeText();  // Own method
+
+--------------------------------------------------------------------------------
+11.4 Encapsulation (Private Fields)
+--------------------------------------------------------------------------------
+Hide internal implementation details using private fields (#).
+
+    class BankAccount {
+        #balance = 0;  // Private field - cannot be accessed outside class
+        #pin;
+
+        constructor(initialBalance, pin) {
+            this.#balance = initialBalance;
+            this.#pin = pin;
+        }
+
+        // Public method to interact with private data
+        deposit(amount) {
+            if (amount > 0) {
+                this.#balance += amount;
+            }
+        }
+
+        withdraw(amount, pin) {
+            if (pin === this.#pin && amount <= this.#balance) {
+                this.#balance -= amount;
+                return amount;
+            }
+            return 0;
+        }
+
+        getBalance() {
+            return this.#balance;
+        }
+    }
+
+    const account = new BankAccount(100, '1234');
+    account.deposit(50);
+    console.log(account.getBalance());  // 150
+    // console.log(account.#balance);   // ERROR - private field
+
+--------------------------------------------------------------------------------
+11.5 Polymorphism
+--------------------------------------------------------------------------------
+Different classes can implement the same method differently.
+
+    class Shape {
+        getArea() {
+            throw new Error('Method must be implemented');
+        }
+    }
+
+    class Rectangle extends Shape {
+        constructor(width, height) {
+            super();
+            this.width = width;
+            this.height = height;
+        }
+
+        getArea() {
+            return this.width * this.height;
+        }
+    }
+
+    class Circle extends Shape {
+        constructor(radius) {
+            super();
+            this.radius = radius;
+        }
+
+        getArea() {
+            return Math.PI * this.radius ** 2;
+        }
+    }
+
+    // Same method name, different implementation
+    const shapes = [new Rectangle(10, 5), new Circle(7)];
+    shapes.forEach(shape => console.log(shape.getArea()));
+
+--------------------------------------------------------------------------------
+11.6 Static Methods and Properties
+--------------------------------------------------------------------------------
+Belong to the class itself, not instances.
+
+    class TestUtils {
+        static baseURL = 'https://example.com';
+
+        static generateRandomEmail() {
+            return `test${Date.now()}@example.com`;
+        }
+
+        static async takeScreenshot(page, name) {
+            await page.screenshot({ path: `screenshots/${name}.png` });
+        }
+    }
+
+    // Use without creating instance
+    console.log(TestUtils.baseURL);
+    console.log(TestUtils.generateRandomEmail());
+    await TestUtils.takeScreenshot(page, 'login-page');
+
+--------------------------------------------------------------------------------
+11.7 Getters and Setters
+--------------------------------------------------------------------------------
+Control how properties are accessed and modified.
+
+    class User {
+        constructor(firstName, lastName) {
+            this._firstName = firstName;
+            this._lastName = lastName;
+        }
+
+        // Getter - access like property
+        get fullName() {
+            return `${this._firstName} ${this._lastName}`;
+        }
+
+        // Setter - assign like property
+        set fullName(name) {
+            const [first, last] = name.split(' ');
+            this._firstName = first;
+            this._lastName = last;
+        }
+
+        get email() {
+            return `${this._firstName.toLowerCase()}@test.com`;
+        }
+    }
+
+    const user = new User('John', 'Doe');
+    console.log(user.fullName);   // 'John Doe' (getter)
+    user.fullName = 'Jane Smith'; // (setter)
+    console.log(user.email);      // 'jane@test.com' (getter)
+
+--------------------------------------------------------------------------------
+11.8 Abstraction (Base Class Pattern)
+--------------------------------------------------------------------------------
+Define interface that child classes must implement.
+
+    class PageObject {
+        constructor(page) {
+            this.page = page;
+        }
+
+        // Abstract methods - must be overridden
+        async navigate() {
+            throw new Error('navigate() must be implemented');
+        }
+
+        async isLoaded() {
+            throw new Error('isLoaded() must be implemented');
+        }
+
+        // Concrete method - shared implementation
+        async waitAndClick(selector) {
+            await this.page.waitForSelector(selector);
+            await this.page.click(selector);
+        }
+    }
+
+    class DashboardPage extends PageObject {
+        constructor(page) {
+            super(page);
+        }
+
+        async navigate() {
+            await this.page.goto('/dashboard');
+        }
+
+        async isLoaded() {
+            return await this.page.isVisible('#dashboard-container');
+        }
+    }
+
+
+================================================================================
+12. ES6+ MODERN JAVASCRIPT FEATURES
+================================================================================
+
+Modern syntax that makes code cleaner and more readable.
+
+--------------------------------------------------------------------------------
+12.1 Template Literals
+--------------------------------------------------------------------------------
+Embed expressions in strings using backticks.
+
+    const name = 'John';
+    const age = 30;
+
+    // String interpolation
+    const message = `User ${name} is ${age} years old`;
+
+    // Multi-line strings
+    const html = `
+        <div class="user">
+            <h1>${name}</h1>
+            <p>Age: ${age}</p>
+        </div>
+    `;
+
+    // Expressions in templates
+    const price = 29.99;
+    const total = `Total: $${(price * 1.1).toFixed(2)}`;
+
+--------------------------------------------------------------------------------
+12.2 Destructuring
+--------------------------------------------------------------------------------
+Extract values from objects and arrays into variables.
+
+    // Object destructuring
+    const user = { name: 'John', email: 'john@test.com', age: 30 };
+    const { name, email } = user;
+    console.log(name);   // 'John'
+
+    // With different variable names
+    const { name: userName, age: userAge } = user;
+
+    // With default values
+    const { role = 'user' } = user;  // role = 'user' (not in object)
+
+    // Array destructuring
+    const coords = [10, 20, 30];
+    const [x, y, z] = coords;
+    console.log(x, y);   // 10 20
+
+    // Skip elements
+    const [first, , third] = coords;  // first=10, third=30
+
+    // Rest pattern
+    const [head, ...tail] = [1, 2, 3, 4];  // head=1, tail=[2,3,4]
+
+--------------------------------------------------------------------------------
+12.3 Spread Operator (...)
+--------------------------------------------------------------------------------
+Expand arrays/objects.
+
+    // Array spread
+    const arr1 = [1, 2, 3];
+    const arr2 = [...arr1, 4, 5];      // [1, 2, 3, 4, 5]
+    const combined = [...arr1, ...arr2]; // Merge arrays
+
+    // Object spread
+    const defaults = { timeout: 5000, headless: true };
+    const config = { ...defaults, headless: false };
+    // { timeout: 5000, headless: false }
+
+    // Copy arrays/objects (shallow copy)
+    const arrCopy = [...arr1];
+    const objCopy = { ...defaults };
+
+--------------------------------------------------------------------------------
+12.4 Optional Chaining (?.)
+--------------------------------------------------------------------------------
+Safely access nested properties without errors.
+
+    const user = {
+        profile: {
+            name: 'John',
+            address: {
+                city: 'NYC'
+            }
+        }
+    };
+
+    // Without optional chaining (verbose)
+    const city1 = user && user.profile && user.profile.address && user.profile.address.city;
+
+    // With optional chaining (clean!)
+    const city2 = user?.profile?.address?.city;  // 'NYC'
+    const country = user?.profile?.address?.country;  // undefined (no error!)
+
+    // With methods
+    const result = someObject?.someMethod?.();
+
+    // With arrays
+    const firstItem = someArray?.[0];
+
+--------------------------------------------------------------------------------
+12.5 Nullish Coalescing (??)
+--------------------------------------------------------------------------------
+Provide default only for null/undefined (not other falsy values).
+
+    const count = 0;
+    const text = '';
+
+    // || treats 0, '', false as falsy
+    console.log(count || 10);   // 10 (0 is falsy)
+    console.log(text || 'default');  // 'default' ('' is falsy)
+
+    // ?? only treats null/undefined as nullish
+    console.log(count ?? 10);   // 0 (0 is valid value)
+    console.log(text ?? 'default');  // '' ('' is valid value)
+    console.log(null ?? 'default');  // 'default'
+    console.log(undefined ?? 'default');  // 'default'
+
+--------------------------------------------------------------------------------
+12.6 Short-Circuit Evaluation
+--------------------------------------------------------------------------------
+Use logical operators for conditional execution.
+
+    const username = userInput || 'defaultUser';  // Fallback value
+    const result = isValid && performAction();    // Only run if valid
+    const debug = process.env.DEBUG && console.log('Debug mode');
+
+--------------------------------------------------------------------------------
+12.7 Object Property Shorthand
+--------------------------------------------------------------------------------
+When property name equals variable name.
+
+    const name = 'John';
+    const age = 30;
+
+    // Long form
+    const user1 = { name: name, age: age };
+
+    // Shorthand
+    const user2 = { name, age };  // Same result
+
+--------------------------------------------------------------------------------
+12.8 Computed Property Names
+--------------------------------------------------------------------------------
+Use expressions as object keys.
+
+    const field = 'email';
+    const index = 1;
+
+    const obj = {
+        [field]: 'john@test.com',         // { email: 'john@test.com' }
+        [`user_${index}`]: 'John',        // { user_1: 'John' }
+        [`get${field.toUpperCase()}`]() { // Method with computed name
+            return this.email;
+        }
+    };
+
+
+================================================================================
+13. MODULES (IMPORT/EXPORT)
+================================================================================
+
+Organize code into reusable files.
+
+--------------------------------------------------------------------------------
+13.1 Named Exports
+--------------------------------------------------------------------------------
+
+    // utils.js - Export multiple items
+    export function generateRandomEmail() {
+        return `test${Date.now()}@example.com`;
+    }
+
+    export function generateRandomNumber(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    export const BASE_URL = 'https://example.com';
+    export const TIMEOUT = 30000;
+
+--------------------------------------------------------------------------------
+13.2 Named Imports
+--------------------------------------------------------------------------------
+
+    // test.spec.js - Import what you need
+    import { generateRandomEmail, BASE_URL } from './utils.js';
+
+    // Import with alias
+    import { generateRandomEmail as randomEmail } from './utils.js';
+
+    // Import all as namespace
+    import * as Utils from './utils.js';
+    console.log(Utils.BASE_URL);
+
+--------------------------------------------------------------------------------
+13.3 Default Export
+--------------------------------------------------------------------------------
+One main export per file (commonly used for classes/components).
+
+    // LoginPage.js
+    export default class LoginPage {
+        constructor(page) {
+            this.page = page;
+        }
+
+        async login(username, password) {
+            // ...
+        }
+    }
+
+    // test.spec.js
+    import LoginPage from './LoginPage.js';
+    // Can use any name for default imports
+
+--------------------------------------------------------------------------------
+13.4 Mixed Exports
+--------------------------------------------------------------------------------
+
+    // api.js
+    export default class ApiClient {
+        // Main class
+    }
+
+    export function formatResponse(response) {
+        // Helper function
+    }
+
+    export const API_VERSION = 'v1';
+
+    // Importing mixed
+    import ApiClient, { formatResponse, API_VERSION } from './api.js';
+
+--------------------------------------------------------------------------------
+13.5 Re-exporting
+--------------------------------------------------------------------------------
+
+    // pages/index.js - Barrel file
+    export { default as LoginPage } from './LoginPage.js';
+    export { default as HomePage } from './HomePage.js';
+    export { default as DashboardPage } from './DashboardPage.js';
+
+    // test.spec.js - Clean imports
+    import { LoginPage, HomePage, DashboardPage } from './pages/index.js';
+
+
+================================================================================
+14. ERROR HANDLING
+================================================================================
+
+Handle errors gracefully to prevent test crashes.
+
+--------------------------------------------------------------------------------
+14.1 try / catch / finally
+--------------------------------------------------------------------------------
+
+    async function performAction(page, selector) {
+        try {
+            // Code that might throw an error
+            await page.click(selector);
+            console.log('Success!');
+        } catch (error) {
+            // Handle the error
+            console.error('Error occurred:', error.message);
+            // Optionally re-throw or return fallback
+        } finally {
+            // Always runs, whether error or not
+            console.log('Action attempted');
+        }
+    }
+
+--------------------------------------------------------------------------------
+14.2 Error Object Properties
+--------------------------------------------------------------------------------
+
+    try {
+        throw new Error('Something went wrong');
+    } catch (error) {
+        console.log(error.message);   // 'Something went wrong'
+        console.log(error.name);      // 'Error'
+        console.log(error.stack);     // Full stack trace
+    }
+
+--------------------------------------------------------------------------------
+14.3 Custom Errors
+--------------------------------------------------------------------------------
+
+    class ValidationError extends Error {
+        constructor(message, field) {
+            super(message);
+            this.name = 'ValidationError';
+            this.field = field;
+        }
+    }
+
+    function validateUser(user) {
+        if (!user.email) {
+            throw new ValidationError('Email is required', 'email');
+        }
+    }
+
+    try {
+        validateUser({});
+    } catch (error) {
+        if (error instanceof ValidationError) {
+            console.log(`Field ${error.field}: ${error.message}`);
+        }
+    }
+
+--------------------------------------------------------------------------------
+14.4 Throwing Errors
+--------------------------------------------------------------------------------
+
+    function divide(a, b) {
+        if (b === 0) {
+            throw new Error('Cannot divide by zero');
+        }
+        return a / b;
+    }
+
+    // In async context
+    async function fetchData(url) {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`HTTP error: ${response.status}`);
+        }
+        return response.json();
+    }
+
+
+================================================================================
+15. JSON HANDLING
+================================================================================
+
+Work with JSON data from APIs and configuration files.
+
+--------------------------------------------------------------------------------
+15.1 JSON.parse() - String to Object
+--------------------------------------------------------------------------------
+
+    const jsonString = '{"name":"John","age":30,"active":true}';
+    const obj = JSON.parse(jsonString);
+
+    console.log(obj.name);     // 'John'
+    console.log(obj.age);      // 30
+
+    // Handle invalid JSON
+    try {
+        const invalid = JSON.parse('not valid json');
+    } catch (error) {
+        console.error('Invalid JSON:', error.message);
+    }
+
+--------------------------------------------------------------------------------
+15.2 JSON.stringify() - Object to String
+--------------------------------------------------------------------------------
+
+    const user = {
+        name: 'John',
+        age: 30,
+        email: 'john@test.com'
+    };
+
+    // Basic conversion
+    const json = JSON.stringify(user);
+    // '{"name":"John","age":30,"email":"john@test.com"}'
+
+    // Pretty print (for logging)
+    const prettyJson = JSON.stringify(user, null, 2);
+    /*
+    {
+      "name": "John",
+      "age": 30,
+      "email": "john@test.com"
+    }
+    */
+
+    // Select specific properties
+    const partial = JSON.stringify(user, ['name', 'email']);
+    // '{"name":"John","email":"john@test.com"}'
+
+
+================================================================================
+16. BUILT-IN OBJECTS (Console, Math, Date)
+================================================================================
+
+--------------------------------------------------------------------------------
+16.1 Console Methods
+--------------------------------------------------------------------------------
+
+    console.log('Info message');           // General output
+    console.error('Error message');        // Errors (red in console)
+    console.warn('Warning message');       // Warnings (yellow)
+    console.info('Information');           // Informational
+
+    // Formatted output
+    console.table([
+        { name: 'John', age: 30 },
+        { name: 'Jane', age: 25 }
+    ]);
+
+    // Grouping
+    console.group('Test Results');
+    console.log('Test 1: Passed');
+    console.log('Test 2: Failed');
+    console.groupEnd();
+
+    // Timing
+    console.time('operation');
+    // ... some operation
+    console.timeEnd('operation');  // operation: 123ms
+
+    // Assertion
+    console.assert(1 === 2, 'One does not equal two');
+
+--------------------------------------------------------------------------------
+16.2 Math Object
+--------------------------------------------------------------------------------
+
+    // Random numbers
+    console.log(Math.random());              // 0 to 0.999...
+    console.log(Math.floor(Math.random() * 10)); // 0 to 9
+
+    // Rounding
+    console.log(Math.floor(3.7));   // 3 (round down)
+    console.log(Math.ceil(3.2));    // 4 (round up)
+    console.log(Math.round(3.5));   // 4 (round to nearest)
+    console.log(Math.trunc(3.7));   // 3 (remove decimal)
+
+    // Min/Max
+    console.log(Math.max(1, 5, 3)); // 5
+    console.log(Math.min(1, 5, 3)); // 1
+
+    // Other useful methods
+    console.log(Math.abs(-5));      // 5 (absolute value)
+    console.log(Math.pow(2, 3));    // 8 (2^3)
+    console.log(Math.sqrt(16));     // 4 (square root)
+
+--------------------------------------------------------------------------------
+16.3 Date Object
+--------------------------------------------------------------------------------
+
+    // Current date/time
+    const now = new Date();
+    console.log(now);
+
+    // Specific date
+    const birthday = new Date('1990-05-15');
+    const specific = new Date(2024, 0, 15, 10, 30, 0);  // Jan 15, 2024 10:30:00
+
+    // Get components
+    console.log(now.getFullYear());   // 2026
+    console.log(now.getMonth());      // 0-11 (0 = January)
+    console.log(now.getDate());       // 1-31
+    console.log(now.getDay());        // 0-6 (0 = Sunday)
+    console.log(now.getHours());      // 0-23
+    console.log(now.getMinutes());    // 0-59
+
+    // Timestamps
+    console.log(Date.now());          // Current timestamp in ms
+    console.log(now.getTime());       // Timestamp of date object
+
+    // Formatting
+    console.log(now.toISOString());        // '2026-02-24T...'
+    console.log(now.toLocaleDateString()); // '2/24/2026'
+    console.log(now.toLocaleTimeString()); // '10:30:00 AM'
+
+--------------------------------------------------------------------------------
+16.4 Timers
+--------------------------------------------------------------------------------
+
+    // setTimeout - run once after delay
+    const timeoutId = setTimeout(() => {
+        console.log('Runs after 2 seconds');
+    }, 2000);
+
+    // Cancel timeout
+    clearTimeout(timeoutId);
+
+    // setInterval - run repeatedly
+    const intervalId = setInterval(() => {
+        console.log('Runs every second');
+    }, 1000);
+
+    // Cancel interval
+    clearInterval(intervalId);
+
+    // NOTE: In Playwright, use page.waitForTimeout() instead:
+    // await page.waitForTimeout(2000);
+
+
+================================================================================
+17. REGULAR EXPRESSIONS
+================================================================================
+
+Pattern matching for validation and text extraction.
+
+--------------------------------------------------------------------------------
+17.1 Creating Regular Expressions
+--------------------------------------------------------------------------------
+
+    // Literal notation
+    const pattern1 = /hello/;
+
+    // Constructor notation
+    const pattern2 = new RegExp('hello');
+
+    // With flags
+    const caseInsensitive = /hello/i;  // i = ignore case
+    const global = /hello/g;           // g = match all occurrences
+    const multiline = /hello/m;        // m = multiline mode
+
+--------------------------------------------------------------------------------
+17.2 Testing Patterns
+--------------------------------------------------------------------------------
+
+    const email = 'test@example.com';
+    const emailPattern = /^[\w.-]+@[\w.-]+\.\w{2,}$/;
+
+    console.log(emailPattern.test(email));  // true
+
+    // Phone number pattern
+    const phone = '123-456-7890';
+    const phonePattern = /^\d{3}-\d{3}-\d{4}$/;
+    console.log(phonePattern.test(phone));  // true
+
+--------------------------------------------------------------------------------
+17.3 Matching and Extracting
+--------------------------------------------------------------------------------
+
+    const text = 'Order ID: 12345, Amount: $99.99';
+
+    // match() - find matches
+    const numbers = text.match(/\d+/g);
+    console.log(numbers);  // ['12345', '99', '99']
+
+    // exec() - detailed match info
+    const pattern = /ID: (\d+)/;
+    const result = pattern.exec(text);
+    console.log(result[0]);  // 'ID: 12345'
+    console.log(result[1]);  // '12345' (captured group)
+
+--------------------------------------------------------------------------------
+17.4 Search and Replace
+--------------------------------------------------------------------------------
+
+    const str = 'Hello World World';
+
+    // Replace first match
+    console.log(str.replace(/World/, 'Playwright'));
+    // 'Hello Playwright World'
+
+    // Replace all matches
+    console.log(str.replace(/World/g, 'Playwright'));
+    // 'Hello Playwright Playwright'
+
+    // Replace with callback
+    const result = 'abc'.replace(/./g, (char) => char.toUpperCase());
+    // 'ABC'
+
+--------------------------------------------------------------------------------
+17.5 Common Patterns
+--------------------------------------------------------------------------------
+
+    // Email
+    const emailRegex = /^[\w.-]+@[\w.-]+\.[a-zA-Z]{2,}$/;
+
+    // URL
+    const urlRegex = /^https?:\/\/[\w.-]+\.[a-zA-Z]{2,}/;
+
+    // Numbers only
+    const numbersOnly = /^\d+$/;
+
+    // Alphanumeric
+    const alphanumeric = /^[a-zA-Z0-9]+$/;
+
+    // Whitespace
+    const hasWhitespace = /\s/;
+
+
+================================================================================
+18. COLLECTIONS: SET AND MAP
+================================================================================
+
+--------------------------------------------------------------------------------
+18.1 Set - Unique Values Collection
+--------------------------------------------------------------------------------
+
+    // Create Set
+    const uniqueNumbers = new Set([1, 2, 2, 3, 4, 4, 5]);
+    console.log([...uniqueNumbers]);  // [1, 2, 3, 4, 5]
+
+    // Add/Remove/Check
+    uniqueNumbers.add(6);
+    uniqueNumbers.delete(1);
+    console.log(uniqueNumbers.has(3));  // true
+    console.log(uniqueNumbers.size);    // 5
+
+    // Convert array to unique values
+    const arr = [1, 1, 2, 2, 3];
+    const unique = [...new Set(arr)];  // [1, 2, 3]
+
+    // Iterate
+    uniqueNumbers.forEach(value => console.log(value));
+
+--------------------------------------------------------------------------------
+18.2 Map - Key-Value Collection
+--------------------------------------------------------------------------------
+
+    // Create Map
+    const cache = new Map();
+
+    // Set values (any type can be key)
+    cache.set('user1', { name: 'John' });
+    cache.set('user2', { name: 'Jane' });
+    cache.set(1, 'Number as key');
+    cache.set({ id: 1 }, 'Object as key');
+
+    // Get values
+    console.log(cache.get('user1'));  // { name: 'John' }
+
+    // Check/Delete
+    console.log(cache.has('user1'));  // true
+    cache.delete('user1');
+    console.log(cache.size);          // 3
+
+    // Iterate
+    cache.forEach((value, key) => {
+        console.log(`${key}: ${value}`);
+    });
+
+    // Convert to array
+    const entries = [...cache.entries()];
+    const keys = [...cache.keys()];
+    const values = [...cache.values()];
+
+
+================================================================================
+19. PLAYWRIGHT-SPECIFIC JAVASCRIPT PATTERNS
+================================================================================
+
+These patterns are essential for writing Playwright tests.
+
+--------------------------------------------------------------------------------
+19.1 Basic Test Structure
+--------------------------------------------------------------------------------
+
+    import { test, expect } from '@playwright/test';
+
+    test('should login successfully', async ({ page }) => {
+        // Navigate
+        await page.goto('https://example.com/login');
+
+        // Fill form
+        await page.fill('#username', 'testuser');
+        await page.fill('#password', 'password123');
+
+        // Click and wait
+        await page.click('button[type="submit"]');
+
+        // Assert
+        await expect(page).toHaveURL(/.*dashboard/);
+        await expect(page.locator('h1')).toContainText('Welcome');
+    });
+
+--------------------------------------------------------------------------------
+19.2 Destructuring Fixtures
+--------------------------------------------------------------------------------
+
+    test('test with multiple fixtures', async ({ page, browser, context }) => {
+        // page - browser page for interactions
+        // browser - browser instance
+        // context - browser context (like incognito window)
+        
+        const newPage = await context.newPage();
+        // ... work with multiple pages
+    });
+
+--------------------------------------------------------------------------------
+19.3 Locator Strategies
+--------------------------------------------------------------------------------
+
+    // By ID
+    await page.locator('#submit-btn').click();
+
+    // By class
+    await page.locator('.primary-button').click();
+
+    // By attribute
+    await page.locator('[data-testid="login-form"]').click();
+
+    // By text
+    await page.locator('text=Sign In').click();
+
+    // By role (recommended for accessibility)
+    await page.getByRole('button', { name: 'Submit' }).click();
+    await page.getByLabel('Email').fill('test@example.com');
+    await page.getByPlaceholder('Enter password').fill('secret');
+
+    // By test ID (recommended)
+    await page.getByTestId('submit-button').click();
+
+    // CSS selector
+    await page.locator('button.primary[type="submit"]').click();
+
+    // XPath
+    await page.locator('//button[@type="submit"]').click();
+
+    // Combining locators
+    await page.locator('form').locator('button').click();
+
+--------------------------------------------------------------------------------
+19.4 Page Object Model Pattern
+--------------------------------------------------------------------------------
+
+    // pages/LoginPage.js
+    export class LoginPage {
+        constructor(page) {
+            this.page = page;
+            this.usernameInput = page.getByLabel('Username');
+            this.passwordInput = page.getByLabel('Password');
+            this.submitButton = page.getByRole('button', { name: 'Login' });
+            this.errorMessage = page.locator('.error');
+        }
+
+        async navigate() {
+            await this.page.goto('/login');
+        }
+
+        async login(username, password) {
+            await this.usernameInput.fill(username);
+            await this.passwordInput.fill(password);
+            await this.submitButton.click();
+        }
+
+        async getError() {
+            return await this.errorMessage.textContent();
+        }
+    }
+
+    // tests/login.spec.js
+    import { test, expect } from '@playwright/test';
+    import { LoginPage } from '../pages/LoginPage.js';
+
+    test('login with valid credentials', async ({ page }) => {
+        const loginPage = new LoginPage(page);
+        await loginPage.navigate();
+        await loginPage.login('validuser', 'validpass');
+        await expect(page).toHaveURL(/.*dashboard/);
+    });
+
+--------------------------------------------------------------------------------
+19.5 Hooks: beforeEach, afterEach
+--------------------------------------------------------------------------------
+
+    import { test, expect } from '@playwright/test';
+    import { LoginPage } from '../pages/LoginPage.js';
+
+    test.describe('Dashboard Tests', () => {
+        test.beforeEach(async ({ page }) => {
+            // Runs before each test
+            const loginPage = new LoginPage(page);
+            await loginPage.navigate();
+            await loginPage.login('testuser', 'password');
+        });
+
+        test.afterEach(async ({ page }) => {
+            // Runs after each test
+            await page.screenshot({ path: `screenshots/test-end.png` });
+        });
+
+        test('should display user name', async ({ page }) => {
+            await expect(page.locator('.user-name')).toContainText('testuser');
+        });
+    });
+
+--------------------------------------------------------------------------------
+19.6 Assertions with expect
+--------------------------------------------------------------------------------
+
+    // Page assertions
+    await expect(page).toHaveURL('https://example.com');
+    await expect(page).toHaveTitle(/Dashboard/);
+
+    // Locator assertions
+    await expect(page.locator('.message')).toBeVisible();
+    await expect(page.locator('.message')).toHaveText('Success!');
+    await expect(page.locator('.message')).toContainText('Success');
+    await expect(page.locator('input')).toHaveValue('test@example.com');
+    await expect(page.locator('button')).toBeEnabled();
+    await expect(page.locator('input')).toBeFocused();
+    await expect(page.locator('.list li')).toHaveCount(5);
+
+    // Negative assertions
+    await expect(page.locator('.error')).not.toBeVisible();
+
+--------------------------------------------------------------------------------
+19.7 Waiting Strategies
+--------------------------------------------------------------------------------
+
+    // Wait for element
+    await page.waitForSelector('.loaded');
+
+    // Wait for URL
+    await page.waitForURL('**/dashboard');
+
+    // Wait for load state
+    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
+
+    // Wait for response
+    const response = await page.waitForResponse('**/api/users');
+
+    // Wait for specific time (avoid if possible)
+    await page.waitForTimeout(1000);
+
+    // Wait for function
+    await page.waitForFunction(() => {
+        return document.querySelectorAll('.item').length > 5;
+    });
+
+
+================================================================================
+20. PRACTICE EXERCISES
+================================================================================
+
+Complete these exercises to solidify your JavaScript knowledge:
+
+1.  Variables & Types: Create objects for 3 test users with name, email, and
+    password. Store them in an array.
+
+2.  Array Methods: Filter users whose email contains "admin". Map the array
+    to get only usernames.
+
+3.  Functions: Write an arrow function that takes username and password,
+    returns an object with those properties plus a timestamp.
+
+4.  async/await: Wrap setTimeout in a Promise and create a sleep function.
+    
+        const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+        await sleep(1000);
+
+5.  Classes: Create a BasePage class and a LoginPage class that extends it.
+    Include at least 2 methods in each.
+
+6.  Destructuring: Create a config object and destructure baseURL, timeout,
+    and headless with default values.
+
+7.  Error Handling: Write an async function that attempts to click an element
+    and returns true on success, false on failure.
+
+8.  Promise.all: Create a function that waits for 3 elements simultaneously.
+
+9.  Regex: Write a function to validate email format using regex.
+
+10. Module Export: Create a utils file with helper functions and import them.
+
+
+================================================================================
+21. NEXT STEPS FOR PLAYWRIGHT
+================================================================================
+
+After mastering JavaScript basics:
+
+1.  Install Playwright:
+        npm init playwright@latest
+
+2.  Learn Locator Strategies:
+        - Role-based (recommended)
+        - Test IDs
+        - CSS selectors
+        - XPath (when needed)
+
+3.  Master Core Actions:
+        - click(), fill(), check(), selectOption()
+        - hover(), dragTo(), scroll()
+
+4.  Understand Assertions:
+        - expect() with matchers
+        - Soft assertions
+        - Custom matchers
+
+5.  Page Object Model:
+        - Structure tests with classes
+        - Separate page logic from test logic
+
+6.  Waiting Strategies:
+        - Auto-waiting (built-in)
+        - Explicit waits when needed
+
+7.  Test Configuration:
+        - playwright.config.js
+        - Projects for multiple browsers
+        - Reporters
+
+8.  Debugging Tools:
+        - Playwright Inspector: npx playwright test --debug
+        - Trace Viewer: npx playwright show-trace
+        - Video recording
+
+9.  API Testing:
+        - request context
+        - Mock API responses
+
+10. CI/CD Integration:
+        - GitHub Actions
+        - Docker containers
+
+
+================================================================================
+KEY TAKEAWAYS FOR AUTOMATION ENGINEERS
+================================================================================
+
+  ✓ async/await is MANDATORY - Almost all Playwright methods are async
+  
+  ✓ Use const by default, let when needed, avoid var
+  
+  ✓ Arrow functions are preferred in modern JavaScript
+  
+  ✓ Destructuring simplifies working with objects and arrays
+  
+  ✓ Template literals make dynamic strings readable
+  
+  ✓ Classes are essential for Page Object Model
+  
+  ✓ Error handling with try/catch prevents test crashes
+  
+  ✓ Array methods (map, filter, find) process element lists
+  
+  ✓ Promise.all() speeds up tests with parallel operations
+  
+  ✓ Optional chaining (?.) prevents null reference errors
+  
+  ✓ Modules keep code organized and reusable
+
+
+================================================================================
+END OF JAVASCRIPT FUNDAMENTALS GUIDE
+================================================================================
+
+This guide covers all essential JavaScript concepts needed for Playwright
+automation. Practice each section with hands-on exercises and apply the
+concepts in your test automation projects.
+
+Happy Testing!
+
